@@ -11,6 +11,8 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
+        List<Task> tasks = new ArrayList<>();
+
         for (int i = 0 ; i < 3 ; i++){
             System.out.println("Enter your Task : ");
             String yourTask = scanner.nextLine() ;
@@ -50,11 +52,15 @@ public class Main {
 
             Task t1 = new Task(yourTask, status , localDate , priority );
 
-            List<Task> tasks = new ArrayList<>();
             tasks.add(t1);
+            System.out.println("Task Added");
 
-            System.out.println(t1);
+        }
 
+        System.out.println("\nAll Tasks : ");
+
+        for (Task task : tasks){
+            System.out.println(task);
         }
 
 
