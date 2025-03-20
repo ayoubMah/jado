@@ -85,11 +85,21 @@ public class TaskManager {
     public void removeTask(int index){
         if(index >= 0 && index < tasks.size()){
             tasks.remove(index);
-            System.out.println("Task removed successfully ");
+            System.out.println("🗑️ Task deleted successfully!");
         }else{
             System.out.println("Invalid task index !");
         }
     }
 
+    // Edit a task
+    public void editTask(int index , Task updatedTask){
+        if (index >= 0 && index < tasks.size()){
+            tasks.set(index , updatedTask);
+            saveTasks();
+            System.out.println("✅ Task updated successfully!");
+        }else {
+            System.out.println("❌ Invalid task index.");
+        }
+    }
 
 }

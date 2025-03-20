@@ -1,7 +1,7 @@
 package ayoub;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -9,14 +9,13 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         TaskManager taskManager = new TaskManager();
 
-        System.out.println("📋 Welcome to To-Do List CLI");
-        System.out.println("✅ Loaded " + taskManager.getTasks().size() + " existing tasks.\n");
-
         while (true) {
-            System.out.println("Choose an option: ");
-            System.out.println("1️⃣ Add Task ---> type 1");
-            System.out.println("2️⃣ View Tasks ---> type 2");
-            System.out.println("3️⃣ Exit ---> type 3");
+            System.out.println("\nChoose an option: ");
+            System.out.println("1️ Add Task");
+            System.out.println("2️ View Tasks");
+            System.out.println("3️ Edit Task");
+            System.out.println("4️ Delete Task");
+            System.out.println("5️ Exit");
 
             String choice = scanner.nextLine();
             switch (choice) {
@@ -27,11 +26,16 @@ public class Main {
                     viewTasks(taskManager);
                     break;
                 case "3":
-                    System.out.println("👋 Exiting... Tasks saved.");
-                    taskManager.saveTasks();
+                    editTask(scanner, taskManager);
+                    break;
+                case "4":
+                    deleteTask(scanner, taskManager);
+                    break;
+                case "5":
+                    System.out.println("👋 Exiting...");
                     return;
                 default:
-                    System.out.println("❌ Invalid choice. Try again.");
+                    System.out.println("❌ Invalid option, try again.");
             }
         }
     }
@@ -40,51 +44,118 @@ public class Main {
         System.out.println("Enter task title:");
         String title = scanner.nextLine();
 
-        System.out.println("Choose status: TODO, DONE");
-        String statusInput = scanner.nextLine().toUpperCase();
-        Status status;
-        try {
-            status = Status.valueOf(statusInput);
-        } catch (IllegalArgumentException e) {
-            System.out.println("⚠ Invalid status. Defaulting to TODO.");
-            status = Status.TODO;
-        }
-
-        System.out.println("Enter due date (yyyy-MM-dd):");
-        String dateInput = scanner.nextLine();
+        System.out.println("Enter due date (YYYY-MM-DD):");
         LocalDate dueDate;
-        try {
-            dueDate = LocalDate.parse(dateInput);
-        } catch (DateTimeParseException e) {
-            System.out.println("⚠ Invalid date. Defaulting to today.");
-            dueDate = LocalDate.now();
+        while (true) {
+            try {
+                dueDate = LocalDate.parse(scanner.nextLine());
+                break;
+            } catch (Exception e) {
+                System.out.println("❌ Invalid date format! Please enter in YYYY-MM-DD format.");
+            }
         }
 
-        System.out.println("Choose priority: RED, ORANGE, GREEN");
-        String priorityInput = scanner.nextLine().toUpperCase();
+        System.out.println("Choose priority: [1] RED [2] ORANGE [3] GREEN");
         Priority priority;
-        try {
-            priority = Priority.valueOf(priorityInput);
-        } catch (IllegalArgumentException e) {
-            System.out.println("⚠ Invalid priority. Defaulting to ORANGE.");
-            priority = Priority.ORANGE;
+        while (true) {
+            String priorityChoice = scanner.nextLine();
+            if (priorityChoice.equals("1")) {
+                priority = Priority.RED;
+                break;
+            } else if (priorityChoice.equals("2")) {
+                priority = Priority.ORANGE;
+                break;
+            } else if (priorityChoice.equals("3")) {
+                priority = Priority.GREEN;
+                break;
+            } else {
+                System.out.println("❌ Invalid choice! Enter 1, 2, or 3.");
+            }
         }
 
-        Task newTask = new Task(title, status, dueDate, priority);
-        taskManager.getTasks().add(newTask);
-        taskManager.saveTasks();
-        System.out.println("✅ Task added successfully!\n");
+        Task newTask = new Task(title, Status.TODO, dueDate, priority);
+        taskManager.addTask(newTask);
+        System.out.println("✅ Task added successfully!");
+    }
+
+
+    private static int getIntInput(Scanner scanner, String message) {
+        while (true) {
+            System.out.println(message);
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input! Please enter a valid number.");
+            }
+        }
+    }
+
+
+    private static void editTask(Scanner scanner, TaskManager taskManager) {
+        viewTasks(taskManager);
+        System.out.println("Enter task number to edit:");
+        int index = Integer.parseInt(scanner.nextLine()) - 1;
+
+        System.out.println("Enter new title:");
+        String newTitle = scanner.nextLine();
+
+        Status newStatus = getStatus(scanner);
+        LocalDate newDate = getDueDate(scanner);
+        Priority newPriority = getPriority(scanner);
+
+        Task updatedTask = new Task(newTitle, newStatus, newDate, newPriority);
+        taskManager.editTask(index, updatedTask);
+    }
+
+    private static void deleteTask(Scanner scanner, TaskManager taskManager) {
+        viewTasks(taskManager);
+        System.out.println("Enter task number to delete:");
+        int index = Integer.parseInt(scanner.nextLine()) - 1;
+        taskManager.removeTask(index);
     }
 
     private static void viewTasks(TaskManager taskManager) {
-        if (taskManager.getTasks().isEmpty()) {
-            System.out.println("📭 No tasks found.");
-            return;
-        }
         System.out.println("\n📌 Your Tasks:");
-        for (Task task : taskManager.getTasks()) {
-            System.out.println(task);
+        List<Task> tasks = taskManager.getTasks();
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + ". " + tasks.get(i));
         }
-        System.out.println();
+    }
+
+    private static Status getStatus(Scanner scanner) {
+        while (true) {
+            System.out.println("Choose status: TODO, DONE");
+            String input = scanner.nextLine().toUpperCase();
+            try {
+                return Status.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid Status! Please enter TODO or DONE.");
+            }
+        }
+    }
+
+    private static LocalDate getDueDate(Scanner scanner) {
+        while (true) {
+            System.out.println("Enter due date (yyyy-MM-dd):");
+            String input = scanner.nextLine();
+            try {
+                return LocalDate.parse(input);
+            } catch (Exception e) {
+                System.out.println("Invalid Date Format! Try again.");
+            }
+        }
+    }
+
+    private static Priority getPriority(Scanner scanner) {
+        while (true) {
+            System.out.println("Choose priority: RED, ORANGE, GREEN");
+            String input = scanner.nextLine().toUpperCase();
+            try {
+                return Priority.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid Priority! Please enter RED, ORANGE, or GREEN.");
+            }
+        }
     }
 }
+

@@ -5,15 +5,15 @@ import java.time.LocalDate;
 public class Task {
     private String title ;
     private Status status ;
-    private LocalDate dueDqte ;
+    private LocalDate dueDate;
     private Priority priority ;
 
 
-    public Task (String title, Status status, LocalDate dueDqte , Priority priority ){
-        this.title = title ;
-        this.status = status ;
-        this.dueDqte = dueDqte ;
-        this.priority = priority ;
+    public Task(String title, Status status, LocalDate dueDate, Priority priority) {
+        this.title = title;
+        this.status = status;
+        this.dueDate = dueDate;
+        this.priority = priority;
     }
 
 
@@ -33,12 +33,12 @@ public class Task {
         this.status = status;
     }
 
-    public LocalDate getDueDqte() {
-        return dueDqte;
+    public LocalDate getDueDate() {
+        return dueDate;
     }
 
-    public void setDueDqte(LocalDate dueDqte) {
-        this.dueDqte = dueDqte;
+    public void setDueDqte(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 
     public Priority getPriority() {
@@ -51,11 +51,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "title = ' " + title + '\'' +
-                ", status = " + status +
-                ", DeadLine = " + dueDqte +
-                ",preioriry = " + priority +
-                '}';
+        return "📌 " + title + " [" + status + "] Due: " + dueDate + " Priority: " + priority;
     }
 }
