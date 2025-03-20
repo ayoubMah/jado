@@ -5,11 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,49 +16,35 @@ import java.util.List;
 public class TaskManager {
 
     private List<Task> tasks = new ArrayList<>() ;
-
-    private static final String FILE_PATH = "tasks.json" ;
+    private Gson gson ;
+    private static final String FILE_PATH = "src/main/resources/tasks.json" ;
 
     public TaskManager () {
-
-    }
-
-    public TaskManager(List<Task> tasks){
-        this.tasks = tasks ;
+        this.gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).create();
+        loadTasks() ;
     }
 
     // saving our task in the json file
     // i use gpt for ✅ ❌ ⚠ ...
-    public void saveTasks(){
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
-                .setPrettyPrinting()
-                .create();
-
-        try(FileWriter writer = new FileWriter(FILE_PATH)){
-            gson.toJson(tasks , writer);
-            System.out.println("✅ Tasks saved successfully!");
-        }catch (IOException e){
+    public void saveTasks() {
+        try (Writer writer = new FileWriter(FILE_PATH)) {
+            gson.toJson(tasks, writer);
+            System.out.println("📁 Tasks saved successfully!");
+        } catch (IOException e) {
             System.out.println("❌ Error saving tasks: " + e.getMessage());
         }
     }
 
-    // read tasks.json and convert the json back into the List<Task>
-    private List<Task> loadTasks(){
-        File file  = new File(FILE_PATH) ;
-        if(!file.exists()){
-            System.out.println("⚠ No saved tasks found. Starting with an empty list.");
-            return new ArrayList<>();
-        }
+    public void loadTasks() {
+        try {
+            if (!Files.exists(Paths.get(FILE_PATH))) return;
+            String json = new String(Files.readAllBytes(Paths.get(FILE_PATH)));
 
-        Gson gson = new Gson();
-        Type taskListType = new TypeToken<List<Task>>() {}.getType();
-
-        try (FileReader reader = new FileReader(FILE_PATH)) {
-            return gson.fromJson(reader, taskListType);
+            Type listType = new TypeToken<List<Task>>() {}.getType();
+            tasks = gson.fromJson(json, listType);
+            System.out.println("✅ Loaded " + tasks.size() + " existing tasks.");
         } catch (IOException e) {
             System.out.println("❌ Error loading tasks: " + e.getMessage());
-            return new ArrayList<>();
         }
     }
 
@@ -71,6 +56,7 @@ public class TaskManager {
     // method to add tasks
     public void addTask(Task task){
         tasks.add(task);
+        saveTasks();
     }
 
     // fetch all tasks

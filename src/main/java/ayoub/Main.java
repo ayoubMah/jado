@@ -7,7 +7,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        TaskManager taskManager = new TaskManager(); // Load existing tasks
+        TaskManager taskManager = new TaskManager();
 
         System.out.println("📋 Welcome to To-Do List CLI");
         System.out.println("✅ Loaded " + taskManager.getTasks().size() + " existing tasks.\n");
@@ -28,7 +28,7 @@ public class Main {
                     break;
                 case "3":
                     System.out.println("👋 Exiting... Tasks saved.");
-                    taskManager.saveTasks(); // Save before exiting
+                    taskManager.saveTasks();
                     return;
                 default:
                     System.out.println("❌ Invalid choice. Try again.");
@@ -71,8 +71,8 @@ public class Main {
         }
 
         Task newTask = new Task(title, status, dueDate, priority);
-        taskManager.getTasks().add(newTask); // Add to list
-        taskManager.saveTasks(); // Save to JSON
+        taskManager.getTasks().add(newTask);
+        taskManager.saveTasks();
         System.out.println("✅ Task added successfully!\n");
     }
 
