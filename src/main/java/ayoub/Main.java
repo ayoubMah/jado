@@ -10,59 +10,66 @@ public class Main {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
+        TaskManager taskManager = new TaskManager() ;
 
-        List<Task> tasks = new ArrayList<>();
 
-        for (int i = 0 ; i < 3 ; i++){
-            System.out.println("Enter your Task : ");
-            String yourTask = scanner.nextLine() ;
+        while (true){
+            System.out.println("\n ============ TO DO LIST MENU : ==============");
+            System.out.println("\n Choose an option: ");
+            System.out.println("1. Add Task");
+            System.out.println("2. View Tasks");
+            System.out.println("3. Mark Task as Done");
+            System.out.println("4. Remove Task");
+            System.out.println("5. Exit");
 
-            System.out.println("Choose status: TODO, DONE");
-            String statusInput = scanner.nextLine().toUpperCase();
+            int choice  = scanner.nextInt();
+            scanner.nextLine() ;
 
-            Status status ;
-            try {
-                status = Status.valueOf(statusInput) ;
-            }catch (IllegalArgumentException e){
-                System.out.println("Invalid Status --> default status is TODO ");
-                status = Status.TODO ;
+            switch (choice){
+                case 1:
+                    System.out.println("Enter the Title of your Task :");
+                    String title = scanner.nextLine() ;
+
+                    System.out.println("Choose status : TODO or DONE ");
+                    Status status = Status.valueOf(scanner.nextLine().toUpperCase());
+
+                    System.out.println("Enter due date (yyyy-MM-dd) ");
+                    LocalDate date = LocalDate.parse(scanner.nextLine()) ;
+
+                    System.out.println("Choose priority: RED, ORANGE, GREEN");
+                    Priority priority = Priority.valueOf(scanner.nextLine().toUpperCase());
+
+                    Task newTask = new Task(title , status , date , priority) ;
+                    taskManager.addTask(newTask);
+                    System.out.println("Task added!");
+
+                    break;
+
+
+                case 2 :
+                    taskManager.listTasks();
+                    break;
+
+                case 3 :
+                    System.out.println("Enter Task number to marked Done ");
+                    int taskIndex = scanner.nextInt() - 1 ;
+                    taskManager.markedDone(taskIndex);
+
+                case 4:
+                    System.out.println("Enter task number to remove:");
+                    int removeIndex = scanner.nextInt() - 1;
+                    taskManager.removeTask(removeIndex);
+                    break;
+
+                case 5:
+                    System.out.println("Exiting... Goodbye!");
+                    return;
+
+                default:
+                    System.out.println("Invalid choice. Try again.");
+
             }
-
-            System.out.println("Enter due date (yyyy-MM-dd):");
-            String dateInput = scanner.nextLine() ;
-
-            LocalDate localDate ;
-            try{
-                localDate = LocalDate.parse(dateInput) ;
-            }catch (DateTimeParseException e){
-                System.out.println("Invalide Date Formate --> Default date in to day");
-                localDate = LocalDate.now() ;
-            }
-
-            System.out.println("Choose priority: RED, ORANGE or GREEN");
-            String priorityInput = scanner.nextLine().toUpperCase();
-
-            Priority priority ;
-            try {
-                priority = Priority.valueOf(priorityInput) ;
-            }catch (IllegalArgumentException e){
-                System.out.println("Invalid Priority --> default Priority is ORANGE ");
-                priority = Priority.ORANGE ;
-            }
-
-            Task t1 = new Task(yourTask, status , localDate , priority );
-
-            tasks.add(t1);
-            System.out.println("Task Added");
 
         }
-
-        System.out.println("\nAll Tasks : ");
-
-        for (Task task : tasks){
-            System.out.println(task);
-        }
-
-
     }
 }
